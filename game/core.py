@@ -7,6 +7,7 @@ from .exceptions import ValidationException, NoContentException
 
 
 class Author:
+    '''This class holds the properties of authors and their methods.'''
     _table = AuthorTable
 
     def __init__(
@@ -35,6 +36,7 @@ class Author:
         }
 
     async def save(self) -> None:
+        '''Saves the author in db. If needed, it creates it otherwise updates it.'''
         if self.author_id is None:
             created_obj = await self._table.create(**self._dict())
             self.author_id = created_obj.author_id
@@ -44,6 +46,7 @@ class Author:
 
     @classmethod
     async def filter(cls: "Type[Author]", **kwargs) -> List["Author"]:
+        '''Filter authors based on kwargs passed.'''
         orm_instances = await cls._table.filter(**kwargs)
         return [
             cls(
@@ -56,6 +59,7 @@ class Author:
 
     @classmethod
     async def all(cls: "Type[Author]") -> List["Author"]:
+        '''Returns all authors in db.'''
         orm_instances = await cls._table.all()
         return [
             cls(
@@ -68,6 +72,7 @@ class Author:
 
     @classmethod
     def orm_to_obj(cls: "Type[Author]", orm_obj: "Author._table") -> "Author":
+        '''Converts orm obj to our obj.'''
         return cls(
             first_name=orm_obj.first_name,
             last_name=orm_obj.last_name,
@@ -77,6 +82,7 @@ class Author:
 
 
 class Game:
+    '''This class holds the fields and methods of Game.'''
     _table = GameTable
 
     def __init__(
@@ -155,6 +161,7 @@ class GameAuthorConnector:
 
     @classmethod
     async def get_authors_from_game(cls: "Type[GameAuthorConnector]", game: Game) -> "GameAuthorConnector":
+        '''Get authors of a game.'''
         if game.orm_obj is None:
             game = await Game.get(game_id=game.game_id)
         author_orm_objs = await game.orm_obj.authors.all()
@@ -167,16 +174,22 @@ class GameAuthorConnector:
 
     @classmethod
     async def add_authors_to_game(cls: "Type[GameAuthorConnector]", game: Game, authors: List[Author]):
+        '''Add new authors to a game.'''
         await game.orm_obj.authors.add(*[
             obj.orm_obj for obj in authors
         ])
 
     async def create(self: "GameAuthorConnector", author_ids: List[int]) -> "GameAuthorConnector":
+        '''
+        Creates game and creates authors in the self.authors as well as fetches authors from ids.
+        Then adds all the authors to the game.
+        '''
         @atomic()
         async def _create():
             filtered_authors = await Author.filter(author_id__in=author_ids)
             if len(filtered_authors) != len(author_ids):
-                raise ValidationException(field="author_ids", error="Some field is wrong.")
+                raise ValidationException(
+                    field="author_ids", error="Some field is wrong.")
 
             await self.game.save()
             for author in self.authors:

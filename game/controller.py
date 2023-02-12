@@ -12,6 +12,12 @@ router = APIRouter()
 async def create_game(
     game: GameDataTypeIn
 ):
+    '''
+    This API creates new game.
+    authors: This field takes a list of authors and creates them the db.
+    author_ids: This field takes a list of int which are the ids of the authors.
+    If you want to add author which already exists in db pass its id. For new authors, use authors field.
+    '''
     game_instance = Game(
         name=game.name,
         url=game.url,
@@ -53,7 +59,9 @@ async def update_game(
     game_id: int,
     game: GameUpdateDataTypeIn
 ):
+    '''Updates the game but it does not provide any way to update author right now.'''
     return await GameAuthorConnector.update_game(game_id=game_id, **game.dict())
+
 
 @router.get("/allAuthors", response_model=List[AuthorDataTypeOut])
 async def all_authors():
