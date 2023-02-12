@@ -1,0 +1,6 @@
+env/
+*.pyi
+*.pyc
+game/__pycache__
+/prod_migrations
+*.toml
