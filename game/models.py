@@ -5,7 +5,6 @@ class AuthorTable(Model):
     author_id = fields.IntField(pk=True)
     first_name = fields.CharField(max_length=30)
     last_name = fields.CharField(max_length=30)
-    email = fields.TextField()
 
 class GameTable(Model):
     game_id = fields.IntField(pk=True)

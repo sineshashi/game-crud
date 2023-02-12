@@ -13,13 +13,11 @@ class Author:
         self,
         first_name: str,
         last_name: str,
-        email: str,
         author_id: Optional[int] = None,
         orm_obj: Optional[AuthorTable] = None
     ) -> None:
         self.first_name = first_name
         self.last_name = last_name
-        self.email = email
         self.author_id = author_id
         self.orm_obj = orm_obj
 
@@ -27,7 +25,6 @@ class Author:
         return {
             "first_name": self.first_name,
             "last_name": self.last_name,
-            "email": self.email,
             "author_id": self.author_id
         }
 
@@ -35,7 +32,6 @@ class Author:
         return {
             "first_name": self.first_name,
             "last_name": self.last_name,
-            "email": self.email
         }
 
     async def save(self) -> None:
@@ -53,7 +49,18 @@ class Author:
             cls(
                 first_name=obj.first_name,
                 last_name=obj.last_name,
-                email=obj.email,
+                author_id=obj.author_id,
+                orm_obj=obj
+            ) for obj in orm_instances
+        ]
+
+    @classmethod
+    async def all(cls: "Type[Author]") -> List["Author"]:
+        orm_instances = await cls._table.all()
+        return [
+            cls(
+                first_name=obj.first_name,
+                last_name=obj.last_name,
                 author_id=obj.author_id,
                 orm_obj=obj
             ) for obj in orm_instances
@@ -64,7 +71,6 @@ class Author:
         return cls(
             first_name=orm_obj.first_name,
             last_name=orm_obj.last_name,
-            email=orm_obj.email,
             author_id=orm_obj.author_id,
             orm_obj=orm_obj
         )

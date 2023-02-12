@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from typing import List
 
 from .datatypes import GameDataTypeIn, GameDataTypeOut, SuccessResponse, GameUpdateDataTypeIn, \
-    GameUpdateDataTypeOut
+    GameUpdateDataTypeOut, AuthorDataTypeOut
 from .core import GameAuthorConnector, Game, Author
 
 router = APIRouter()
@@ -21,7 +21,6 @@ async def create_game(
         Author(
             first_name=obj.first_name,
             last_name=obj.last_name,
-            email=obj.email
         ) for obj in game.authors
     ]
     return (await GameAuthorConnector(
@@ -55,3 +54,9 @@ async def update_game(
     game: GameUpdateDataTypeIn
 ):
     return await GameAuthorConnector.update_game(game_id=game_id, **game.dict())
+
+@router.get("/allAuthors", response_model=List[AuthorDataTypeOut])
+async def all_authors():
+    return [
+        obj.dict() for obj in await Author.all()
+    ]

@@ -9,14 +9,6 @@ from .exceptions import ValidationException
 class AuthorDataTypeIn(BaseModel):
     first_name: str
     last_name: str
-    email: str
-
-    @validator("email")
-    def validate_email(cls, v, values):
-        if validators.email(v):
-            return v
-        raise ValidationException(field="email", error="Invalid")
-
 
 class GameDataTypeIn(BaseModel):
     name: str
@@ -50,7 +42,6 @@ class AuthorDataTypeOut(BaseModel):
     author_id: int
     first_name: str
     last_name: str
-    email: str
 
 
 class GameDataTypeOut(BaseModel):
